@@ -1,0 +1,17 @@
+```{r}
+#Call the Data
+HMDA2014 <- read.csv("https://api.consumerfinance.gov:443/data/hmda/slice/hmda_lar.csv?$where=as_of_year=2014+AND+state_code=26+AND+county_code=77&$limit=1000000&$offset=0")
+```
+
+```{r}
+#Subset to COK Tracts
+COK2014 <- subset(HMDA2014, (census_tract_number == 1.00| census_tract_number == 2.01| census_tract_number == 2.02| census_tract_number == 3.00| census_tract_number == 5.00| census_tract_number == 6.00| census_tract_number == 9.00| census_tract_number == 10.00| census_tract_number == 11.00| census_tract_number == 12.00| census_tract_number == 15.04| census_tract_number == 15.06| census_tract_number == 15.07| census_tract_number == 16.01| census_tract_number == 16.03| census_tract_number == 16.04| census_tract_number == 17.01| census_tract_number == 17.02| census_tract_number == 18.01| census_tract_number == 18.02| census_tract_number == 18.03| census_tract_number == 29.03| census_tract_number == 55.01| census_tract_number == 55.02))
+```
+
+```{r}
+#Create Plots
+ggplot(aes(x = applicant_race_name_1),data = COK2014) + 
+  geom_bar(color = "blue",stat = "count")+
+  coord_flip()
+
+```
