@@ -1,0 +1,68 @@
+```{r}
+#plyr, dplyr, ggplot2
+library(plyr)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+#Call the Data
+HMDA2011 <- read.csv("https://api.consumerfinance.gov:443/data/hmda/slice/hmda_lar.csv?$where=as_of_year=2011+AND+state_code=26+AND+county_code=25&$limit=1000000&$offset=0")
+```
+
+```{r}
+#Subset to COBC Tracts
+COBC2011<- subset(HMDA2011, (census_tract_number == 1| 
+                                census_tract_number == 2|
+                                census_tract_number == 3|
+                                census_tract_number == 4|
+                                census_tract_number == 5|
+                                census_tract_number == 6|
+                                census_tract_number == 7|
+                                census_tract_number == 8|
+                                census_tract_number == 9|
+                                census_tract_number == 10|
+                                census_tract_number == 11|
+                                census_tract_number == 12|
+                                census_tract_number == 13|
+                                census_tract_number == 14|
+                                census_tract_number == 15|
+                                census_tract_number == 16|
+                                census_tract_number == 17|
+                                census_tract_number == 18|
+                                census_tract_number == 21|
+                                census_tract_number == 25|
+                                census_tract_number == 26))
+```
+
+```{r}
+#Map data
+a <- subset(COBC2011, COBC2011$action_taken==1)
+ab <-plyr::count(a,"census_tract_number")
+
+b <- subset(COBC2011, COBC2011$action_taken==2)
+bb <-plyr::count(b,"census_tract_number")
+
+A <- dplyr::full_join(ab,bb, by='census_tract_number')
+
+
+c <- subset(COBC2011, COBC2011$action_taken==3)
+cb <-plyr::count(c,"census_tract_number")
+
+d <- subset(COBC2011, COBC2011$action_taken==4)
+db <-plyr::count(d,"census_tract_number")
+
+B <- dplyr::full_join(cb,db, by='census_tract_number')
+AB <- dplyr::full_join(A,B, by='census_tract_number')
+
+e <- subset(COBC2011, COBC2011$action_taken==5)
+eb <-plyr::count(e,"census_tract_number")
+
+ABe <- dplyr::full_join(AB, eb, by='census_tract_number')
+ABe[is.na(ABe)] <- 0
+#map <- plyr::rename(ABe, replace = c("census_tract_number", "freq.x.x" = "loans_orig", "freq.y.x"= "not_accepted", "freq.x.y" = "denied", "freq.y.y" = "withdrawn", "freq" = "incomplete"))
+
+#save 'map' to for GIS
+#write.csv(map, file = "2014HMDACounts.csv", row.names = FALSE)
+
+```
