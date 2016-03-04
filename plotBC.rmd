@@ -1,0 +1,76 @@
+---
+title: "plotBC"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+#Call the Data
+HMDA2011 <- read.csv("https://api.consumerfinance.gov:443/data/hmda/slice/hmda_lar.csv?$where=as_of_year=2011+AND+state_code=26+AND+county_code=25&$limit=1000000&$offset=0")
+```
+
+```{r}
+#Subset to COBC Tracts
+COBC2011<- subset(HMDA2011, (census_tract_number == 1| 
+                                census_tract_number == 2|
+                                census_tract_number == 3|
+                                census_tract_number == 4|
+                                census_tract_number == 5|
+                                census_tract_number == 6|
+                                census_tract_number == 7|
+                                census_tract_number == 8|
+                                census_tract_number == 9|
+                                census_tract_number == 10|
+                                census_tract_number == 11|
+                                census_tract_number == 12|
+                                census_tract_number == 13|
+                                census_tract_number == 14|
+                                census_tract_number == 15|
+                                census_tract_number == 16|
+                                census_tract_number == 17|
+                                census_tract_number == 18|
+                                census_tract_number == 21|
+                                census_tract_number == 25|
+                                census_tract_number == 26))
+```
+
+```{r}
+# Create Plots - Loans Originated
+ggplot(data = subset(COBC2013,COBC2013$action_taken==1), aes(x=applicant_race_name_1))+
+  geom_bar(width = .75, fill ="#66CC66", colour = "black")+
+  coord_flip()+
+  geom_text(stat='count',aes(label=..count..),hjust= 1.5)+
+  scale_x_discrete("Loans Originated 2013", labels =
+  c("American Indian or Alaska Native" = "American Indian or Alaska Native",
+  "Asian" = "Asian",
+  "Black or African American" = "Black or African American",
+  "Native Hawaiian or Other Pacific Islander" = "Native Hawaiian or Other P.I.",
+  "White" = "White",
+  'Information not provided by applicant in mail, Internet, or telephone application'="Information not provided",
+  "Not applicable" = "N/A"))+
+  theme(axis.text.y = element_text(size  = 12))
+  
+```
