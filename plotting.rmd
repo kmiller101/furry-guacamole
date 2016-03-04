@@ -1,0 +1,69 @@
+```{r}
+#plyr, dplyr, ggplot2
+library(plyr)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+#Call the Data
+HMDA2014 <- read.csv("https://api.consumerfinance.gov:443/data/hmda/slice/hmda_lar.csv?$where=as_of_year=2014+AND+state_code=26+AND+county_code=77&$limit=1000000&$offset=0")
+```
+
+```{r}
+#Subset to COK Tracts
+COK2014 <- subset(HMDA2014, (census_tract_number == 1.00| census_tract_number == 2.01| census_tract_number == 2.02| census_tract_number == 3.00| census_tract_number == 5.00| census_tract_number == 6.00| census_tract_number == 9.00| census_tract_number == 10.00| census_tract_number == 11.00| census_tract_number == 12.00| census_tract_number == 15.04| census_tract_number == 15.06| census_tract_number == 15.07| census_tract_number == 16.01| census_tract_number == 16.03| census_tract_number == 16.04| census_tract_number == 17.01| census_tract_number == 17.02| census_tract_number == 18.01| census_tract_number == 18.02| census_tract_number == 18.03| census_tract_number == 29.03| census_tract_number == 55.01| census_tract_number == 55.02))
+```
+
+
+```{r}
+#Create Plots - Loans Originated
+ggplot(data = subset(COK2014,COK2014$action_taken==1), aes(x=applicant_race_name_1))+
+  geom_bar(width = .75, fill ="#66CC66", colour = "black")+
+  coord_flip()+
+  geom_text(stat='count',aes(label=..count..),hjust= 1.5)+
+  scale_x_discrete("Loans Originated 2014", labels = 
+  c("American Indian or Alaska Native" = "American Indian or Alaska Native", 
+  "Asian" = "Asian",
+  "Black or African American" = "Black or African American",
+  "Native Hawaiian or Other Pacific Islander" = "Native Hawaiian or Other P.I.",
+  "White" = "White",
+  'Information not provided by applicant in mail, Internet, or telephone application'="Information not provided",
+  "Not applicable" = "N/A"))+
+  theme(axis.text.y = element_text(size  = 12))
+  
+```
+
+```{r}
+#Map data
+a <- subset(COK2014, COK2014$action_taken==1)
+ab <-plyr::count(a,"census_tract_number")
+
+b <- subset(COK2014, COK2014$action_taken==2)
+bb <-plyr::count(b,"census_tract_number")
+
+A <- dplyr::full_join(ab,bb, by='census_tract_number')
+
+
+c <- subset(COK2014, COK2014$action_taken==3)
+cb <-plyr::count(c,"census_tract_number")
+
+d <- subset(COK2014, COK2014$action_taken==4)
+db <-plyr::count(d,"census_tract_number")
+
+B <- dplyr::full_join(cb,db, by='census_tract_number')
+AB <- dplyr::full_join(A,B, by='census_tract_number')
+
+e <- subset(COK2014, COK2014$action_taken==5)
+eb <-plyr::count(e,"census_tract_number")
+
+ABe <- dplyr::full_join(AB, eb, by='census_tract_number')
+ABe[is.na(ABe)] <- 0
+#map <- plyr::rename(ABe, replace = c("census_tract_number", "freq.x.x" = "loans_orig", "freq.y.x"= "not_accepted", "freq.x.y" = "denied", "freq.y.y" = "withdrawn", "freq" = "incomplete"))
+
+#save 'map' to for GIS
+#write.csv(map, file = "2014HMDACounts.csv", row.names = FALSE)
+
+```
+
+#
